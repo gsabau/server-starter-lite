@@ -79,7 +79,22 @@ Im Terminal **Strg+C**. Der Prozess hört auf.
 
 ## Chat
 
-`app.py` ist der Chat, kein zweiter Server. Er öffnet im Browser. Es spricht mit `llama3.2` über Ollama, `http://127.0.0.1:11434`. Das Modell darf drei Aufrufe. User nur lesen, gegen diese API. Wetter über Open-Meteo, ohne Schlüssel, bis zu 10 Tage:
+`app.py` ist der Chat, kein zweiter Server. Er öffnet im Browser. Modell, Schlüssel und die User-API stehen in `.env`. Die Vorlage ist `.env.example`.
+
+```powershell
+copy .env.example .env
+```
+
+| Name | Bedeutung |
+|---|---|
+| `USERS_API` | Basis der User-API, Standard `http://127.0.0.1:8000/api/v1` |
+| `MODEL_NAME` | Modell bei Ollama, Standard `llama3.2` |
+| `MODEL_BASE_URL` | Ollama, Standard `http://127.0.0.1:11434/v1` |
+| `MODEL_API_KEY` | Schlüssel, bei Ollama lokal `ollama` |
+
+Fehlt ein Name, gilt derselbe Standard. `python app.py` startet also auch ohne Datei.
+
+Die Aufrufe stehen in `tools.py`. Welche davon das Modell bekommt, steht in `app.py` in der Liste `tools=[...]`. Ein Name, der dort fehlt, ist nicht dabei. Jetzt sind es drei. User nur lesen, gegen diese API. Wetter über Open-Meteo, ohne Schlüssel, bis zu 10 Tage:
 
 - `list_users` — `GET /api/v1/users`
 - `get_user` — `GET /api/v1/users/{user_id}`
@@ -87,7 +102,7 @@ Im Terminal **Strg+C**. Der Prozess hört auf.
 
 Anlegen, Ersetzen und Löschen gibt es hier nicht. Der Verlauf bleibt im Fenster.
 
-`main.py` läuft auf Port 8000. Ollama muss laufen, Modell `llama3.2`.
+`main.py` läuft auf Port 8000. Ollama muss laufen, mit dem Modell aus `MODEL_NAME`.
 
 ```powershell
 pip install -r requirements.txt

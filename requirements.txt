@@ -3,3 +3,4 @@ uvicorn
 httpx
 pydantic-ai-slim[openai]
 flet
+python-dotenv
