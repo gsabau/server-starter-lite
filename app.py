@@ -1,37 +1,24 @@
-import os
-
 import flet as ft
-from dotenv import load_dotenv
-from pydantic_ai import Agent
-from pydantic_ai.models.ollama import OllamaModel
-from pydantic_ai.providers.ollama import OllamaProvider
 
-from tools import get_user, get_weather, list_users
+from agent import make_agent
 
-load_dotenv()
-
-model = OllamaModel(
-    os.environ.get("MODEL_NAME", "llama3.2"),
-    provider=OllamaProvider(
-        base_url=os.environ.get("MODEL_BASE_URL", "http://127.0.0.1:11434/v1"),
-        api_key=os.environ.get("MODEL_API_KEY", "ollama"),
-    )
-)
-
-agent = Agent(
-    model,
-    system_prompt=(
-        "Du beantwortest Fragen zu Usern und zum Wetter. "
-        "User-Daten kommen nur aus list_users und get_user. "
-        "Wetter kommt nur aus get_weather. "
-        "Erfinde keine User und kein Wetter."
-    ),
-    tools=[list_users, get_user, get_weather]
-)
 
 async def main(page: ft.Page):
     page.title = "Users"
+    agent = make_agent()
     history = []
+    token_count = ft.TextSpan(
+        "0",
+        style=ft.TextStyle(weight=ft.FontWeight.BOLD, color=ft.Colors.GREEN),
+    )
+    tokens = ft.Text(
+        spans=[
+            ft.TextSpan("Tokens "),
+            token_count,
+            ft.TextSpan(" it's free!"),
+        ],
+        text_align=ft.TextAlign.LEFT,
+    )
     chat = ft.ListView(expand=True, auto_scroll=True, spacing=16, padding=12)
     prompt = ft.TextField(hint_text="Frage", expand=True, autofocus=True)
 
@@ -52,6 +39,7 @@ async def main(page: ft.Page):
             result = await agent.run(text, message_history=history)
             history[:] = result.all_messages()
             reply = result.output
+            token_count.text = str(agent.total)
         except Exception as err:
             reply = str(err)
         chat.controls.remove(loading)
@@ -62,7 +50,7 @@ async def main(page: ft.Page):
 
     prompt.on_submit = send
     send_button = ft.Button("Senden", on_click=send)
-    page.add(chat, ft.Row([prompt, send_button]))
+    page.add(tokens, chat, ft.Row([prompt, send_button]))
 
 
 if __name__ == "__main__":

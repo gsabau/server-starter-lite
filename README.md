@@ -94,13 +94,13 @@ copy .env.example .env
 
 Fehlt ein Name, gilt derselbe Standard. `python app.py` startet also auch ohne Datei.
 
-Die Aufrufe stehen in `tools.py`. Welche davon das Modell bekommt, steht in `app.py` in der Liste `tools=[...]`. Ein Name, der dort fehlt, ist nicht dabei. Jetzt sind es drei. User nur lesen, gegen diese API. Wetter über Open-Meteo, ohne Schlüssel, bis zu 10 Tage:
+Die Aufrufe stehen in `tools.py`. Welche davon das Modell bekommt, steht in `agent.py` in `make_agent`, in der Liste `tools=[...]`. Ein Name, der dort fehlt, ist nicht dabei. Jetzt sind es drei. User nur lesen, gegen diese API. Wetter über Open-Meteo, ohne Schlüssel, bis zu 10 Tage:
 
 - `list_users` — `GET /api/v1/users`
 - `get_user` — `GET /api/v1/users/{user_id}`
 - `get_weather` — Stadt und Anzahl Tage, zum Beispiel Vienna, 7
 
-Anlegen, Ersetzen und Löschen gibt es hier nicht. Der Verlauf bleibt im Fenster.
+Anlegen, Ersetzen und Löschen gibt es hier nicht. Der Verlauf bleibt im Fenster. Oben links steht die Summe aus Prompt- und Antwort-Tokens für dieses Fenster.
 
 `main.py` läuft auf Port 8000. Ollama muss laufen, mit dem Modell aus `MODEL_NAME`.
 
