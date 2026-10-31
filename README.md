@@ -2,7 +2,7 @@
 
 REST-API für eine Ressource: User. Eine Datei, `main.py`. Kein Frontend. Keine Datenbank. Der Speicher ist ein Dict.
 
-Beim Start liegen zehn User im Dict, von Ada bis Jens. Jeder hat eine `role` (`dev`, `crm`, `project`, `sales`) und ein `created_at`. Beides ist optional. Ein Neustart wirft jeden User weg, der danach angelegt wurde, und lädt die zehn wieder.
+Beim Start liegen zehn User im Dict, von Ada bis Jens. Jeder hat eine `role` (`dev`, `crm`, `project`, `sales`), ein `created_at` und `hobbies`. Dazu optional `email`. Bei den zehn ist sie gesetzt. Die Hobbys sind `outdoors`, `gaming`, `movies`, `books`, `sports`, `music`, `cooking`, `travel`. Jeder der zehn hat mindestens eines, manche mehrere. Ein Neustart wirft jeden User weg, der danach angelegt wurde, und lädt die zehn wieder.
 
 In dieser Fassung steht der Vertrag im Vordergrund: Pfad, Methode, Status, Form. Und wo dieser Vertrag in `/docs` steht.
 
@@ -20,7 +20,7 @@ Der Pfad nennt die Ressource, nicht die Tätigkeit: `/users`.
 | Ersetzen | PUT | `/api/v1/users/{user_id}` | **200** |
 | Entfernen | DELETE | `/api/v1/users/{user_id}` | **204** |
 
-Die Id steht im Pfad, sobald es um einen User geht. Der Body von POST und PUT trägt den Namen und optional `role`. Die Id und `created_at` vergibt der Server.
+Die Id steht im Pfad, sobald es um einen User geht. Der Body von POST und PUT trägt den Namen und optional `role`, `hobbies` und `email`. Die Id und `created_at` vergibt der Server.
 
 ```json
 {"name": "Ben", "role": "sales"}
@@ -77,24 +77,19 @@ uvicorn main:app --reload
 
 Im Terminal **Strg+C**. Der Prozess hört auf.
 
-## Testserver
+## Chat
 
-`test_server.py` liegt neben `main.py`. Er spricht mit `llama3.2` über Ollama, `http://127.0.0.1:11434`. Das Modell darf nur zwei Aufrufe, beide gegen diese API:
+`app.py` ist der Chat, kein zweiter Server. Er öffnet im Browser. Es spricht mit `llama3.2` über Ollama, `http://127.0.0.1:11434`. Das Modell darf drei Aufrufe. User nur lesen, gegen diese API. Wetter über Open-Meteo, ohne Schlüssel, bis zu 10 Tage:
 
 - `list_users` — `GET /api/v1/users`
 - `get_user` — `GET /api/v1/users/{user_id}`
+- `get_weather` — Stadt und Anzahl Tage, zum Beispiel Vienna, 7
 
-Anlegen, Ersetzen und Löschen gibt es hier nicht. Der Testserver merkt sich nichts. Der Verlauf kommt im Body zurück und geht beim nächsten Aufruf wieder mit.
+Anlegen, Ersetzen und Löschen gibt es hier nicht. Der Verlauf bleibt im Fenster.
 
-`main.py` läuft auf Port 8000. Der Testserver auf Port 8001. Ollama muss laufen, Modell `llama3.2`.
+`main.py` läuft auf Port 8000. Ollama muss laufen, Modell `llama3.2`.
 
 ```powershell
 pip install -r requirements.txt
-uvicorn test_server:app --reload --port 8001
-```
-
-`POST http://127.0.0.1:8001/api/chat`
-
-```json
-{"prompt": "Wer hat die Id 1?"}
+python app.py
 ```
