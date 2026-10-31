@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from fastapi import APIRouter, FastAPI, HTTPException
 
 app = FastAPI(
@@ -11,14 +11,26 @@ router = APIRouter(prefix="/api/v1", tags=["User"])
 
 
 class UserBody(BaseModel):
-    name: str
+    name: str = Field(description="Name. Der Body von POST und PUT trägt nur dieses Feld.")
+
 
 class User(BaseModel):
-    id: int
-    name: str
+    id: int = Field(description="Vergibt der Server. Steht im Pfad, sobald es um einen User geht.")
+    name: str = Field(description="Name des Users.")
 
-users: dict[int, User] = {1: User(id=1, name="Ada")}
-next_id = 2
+users: dict[int, User] = {
+    1: User(id=1, name="Ada"),
+    2: User(id=2, name="Berta"),
+    3: User(id=3, name="Chris"),
+    4: User(id=4, name="Dora"),
+    5: User(id=5, name="Emil"),
+    6: User(id=6, name="Fritz"),
+    7: User(id=7, name="Greta"),
+    8: User(id=8, name="Hans"),
+    9: User(id=9, name="Ida"),
+    10: User(id=10, name="Jens"),
+}
+next_id = 11
 
 
 @router.post("/users", status_code=201, summary="User anlegen")
@@ -34,7 +46,7 @@ def create_user(body: UserBody) -> User:
     Antwort **201**:
 
     ```json
-    {"id": 2, "name": "Ben"}
+    {"id": 11, "name": "Ben"}
     ```
     """
     global next_id

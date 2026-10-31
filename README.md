@@ -2,7 +2,7 @@
 
 REST-API für eine Ressource: User. Eine Datei, `main.py`. Kein Frontend. Keine Datenbank. Der Speicher ist ein Dict.
 
-Beim Start liegt ein User im Dict: `{"id": 1, "name": "Ada"}`. Ein Neustart wirft jeden User weg, der danach angelegt wurde, und lädt Ada wieder.
+Beim Start liegen zehn User im Dict, von `{"id": 1, "name": "Ada"}` bis `{"id": 10, "name": "Jens"}`. Ein Neustart wirft jeden User weg, der danach angelegt wurde, und lädt die zehn wieder.
 
 In dieser Fassung steht der Vertrag im Vordergrund: Pfad, Methode, Status, Form. Und wo dieser Vertrag in `/docs` steht.
 
@@ -28,20 +28,21 @@ Die Id steht im Pfad, sobald es um einen User geht. Der Body von POST und PUT tr
 
 GET legt nichts an. PUT ersetzt den ganzen Eintrag, die Id bleibt. DELETE antwortet ohne Body.
 
-Die Formen `User` und `UserBody` sind Dataclasses in `main.py`. FastAPI macht daraus JSON.
+Die Formen `User` und `UserBody` sind Pydantic-Modelle in `main.py`. FastAPI macht daraus JSON. Am Feld steht `Field(description=...)`. Das ist der Text unter dem Feld in `/docs`.
 
 ## Dokumentation
 
 FastAPI schreibt die Beschreibung beim Start. Keine zweite Datei. Sichtbar unter [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs). Die Datei dazu ist [http://127.0.0.1:8000/openapi.json](http://127.0.0.1:8000/openapi.json).
 
-Vier Ebenen, alle in `main.py`:
+Fünf Ebenen, alle in `main.py`:
 
 1. **App** — `FastAPI(...)`: `title`, `description`, `version`. Steht oben in `/docs`.
 2. **Router** — `APIRouter(prefix="/api/v1", tags=["users"])`. Jede Route hängt unter dem Präfix. Der Tag gruppiert die Ressource.
 3. **Operation** — am Decorator: `summary`. Das ist die kurze Zeile in der Liste.
 4. **Methode** — der Docstring unter der Funktion. Hier steht Markdown: was die Operation tut, der Status, ein JSON-Beispiel.
+5. **Feld** — `Field(description=...)` an `UserBody` und `User`. Steht am Schema in `/docs`, unter dem Feld.
 
-Die ersten drei Ebenen sind Klartext. Markdown nur im Docstring.
+Die Ebenen 1 bis 3 und das Feld sind Klartext. Markdown nur im Docstring.
 
 ## FastAPI und uvicorn
 
