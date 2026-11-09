@@ -1,20 +1,7 @@
 from datetime import datetime, timezone
-from typing import Literal
 
-from pydantic import BaseModel, Field
 from fastapi import APIRouter, FastAPI, HTTPException
-
-Role = Literal["dev", "crm", "project", "sales"]
-Hobby = Literal[
-    "outdoors",
-    "gaming",
-    "movies",
-    "books",
-    "sports",
-    "music",
-    "cooking",
-    "travel",
-]
+from user_schema import User, UserBody
 
 app = FastAPI(
     title="Users",
@@ -23,43 +10,6 @@ app = FastAPI(
 )
 
 router = APIRouter(prefix="/api/v1", tags=["User"])
-
-
-class UserBody(BaseModel):
-    name: str = Field(description="Name. Pflicht.")
-    role: Role | None = Field(
-        default=None,
-        description="Optional. Eine von dev, crm, project, sales.",
-    )
-    hobbies: list[Hobby] | None = Field(
-        default=None,
-        description="Optional. Mehrere möglich: outdoors, gaming, movies, books, sports, music, cooking, travel.",
-    )
-    email: str | None = Field(
-        default=None,
-        description="Optional. Adresse des Users.",
-    )
-
-
-class User(BaseModel):
-    id: int = Field(description="Vergibt der Server. Steht im Pfad, sobald es um einen User geht.")
-    name: str = Field(description="Name des Users.")
-    role: Role | None = Field(
-        default=None,
-        description="Optional. dev, crm, project oder sales.",
-    )
-    created_at: str | None = Field(
-        default=None,
-        description="Vergibt der Server. Optional. Eine Schreibweise: created_at.",
-    )
-    hobbies: list[Hobby] | None = Field(
-        default=None,
-        description="Optional. Mindestens eines bei den zehn. Mehrere möglich.",
-    )
-    email: str | None = Field(
-        default=None,
-        description="Optional. Bei den zehn gesetzt.",
-    )
 
 
 def now_iso() -> str:
@@ -83,20 +33,6 @@ next_id = 11
 
 @router.post("/users", status_code=201, summary="User anlegen")
 def create_user(body: UserBody) -> User:
-    """Legt einen User an.
-
-    Die Id und `created_at` vergibt der Server. `role`, `hobbies` und `email` sind optional.
-
-    ```json
-    {"name": "Ben", "role": "sales", "hobbies": ["books", "gaming"]}
-    ```
-
-    Antwort **201**:
-
-    ```json
-    {"id": 11, "name": "Ben", "role": "sales", "created_at": "2026-10-31T13:00:00Z", "hobbies": ["books", "gaming"]}
-    ```
-    """
     global next_id
     user = User(
         id=next_id,
@@ -113,27 +49,11 @@ def create_user(body: UserBody) -> User:
 
 @router.get("/users", summary="Alle User lesen")
 def list_users() -> list[User]:
-    """Liest die Ressource. Legt nichts an.
-
-    Antwort **200**, eine Liste:
-
-    ```json
-    [{"id": 1, "name": "Ada", "role": "dev", "created_at": "2026-10-02T08:14:00Z", "hobbies": ["cooking", "books", "movies"], "email": "ada.klein@example.com"}]
-    ```
-    """
     return list(users.values())
 
 
 @router.get("/users/{user_id}", summary="Einen User lesen")
 def read_user(user_id: int) -> User:
-    """Liest einen User. Die Id steht im Pfad.
-
-    Antwort **200**:
-
-    ```json
-    {"id": 1, "name": "Ada", "role": "dev", "created_at": "2026-10-02T08:14:00Z", "hobbies": ["cooking", "books", "movies"], "email": "ada.klein@example.com"}
-    ```
-    """
     if user_id in users:
         return users[user_id]
     else:
@@ -142,20 +62,6 @@ def read_user(user_id: int) -> User:
 
 @router.put("/users/{user_id}", summary="User ersetzen")
 def replace_user(user_id: int, body: UserBody) -> User:
-    """    Ersetzt den Eintrag. Die Id und `created_at` bleiben. `role`, `hobbies` und `email` nur, wenn der Body sie trägt.
-
-    Body:
-
-    ```json
-    {"name": "Cleo", "role": "project", "hobbies": ["sports"]}
-    ```
-
-    Antwort **200**:
-
-    ```json
-    {"id": 1, "name": "Cleo", "role": "project", "created_at": "2026-10-02T08:14:00Z", "hobbies": ["sports"]}
-    ```
-    """
     if user_id not in users:
         raise HTTPException(status_code=404, detail="User not found")
     current = users[user_id]
@@ -173,10 +79,6 @@ def replace_user(user_id: int, body: UserBody) -> User:
 
 @router.delete("/users/{user_id}", status_code=204, summary="User löschen")
 def delete_user(user_id: int) -> None:
-    """Entfernt den User. Die Id steht im Pfad.
-
-    Antwort **204**. Kein Body.
-    """
     del users[user_id]
 
 
