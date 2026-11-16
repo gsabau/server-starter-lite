@@ -1,7 +1,9 @@
+import json
 import os
 
 import httpx
 from pydantic_ai import RunContext
+from user_schema import Role
 
 
 def users_api() -> str:
@@ -19,12 +21,34 @@ async def read_users_api(path: str) -> str:
     return res.text
 
 
-async def list_users(ctx: RunContext) -> str:
-    """Return all users as JSON. No filter. GET /api/v1/users."""
-    return await read_users_api("/users")
+def as_lines(text: str, role: str | None) -> str:
+    """Turn a JSON list of users into one plain line per user. Optionally keep one role."""
+    try:
+        users = json.loads(text)
+    except json.JSONDecodeError:
+        return text
+    if role:
+        users = [u for u in users if u.get("role") == role]
+    lines = [f"{len(users)} users" + (f" with role {role}" if role else "")]
+    for user in users:
+        lines.append(", ".join(f"{key}={value}" for key, value in user.items()))
+    return "\n".join(lines)
+
+
+async def list_users(ctx: RunContext, role: Role | None = None) -> str:
+    """List users and count them. Use this for questions about several users, counts or groups.
+
+    role: only users with this role. Leave empty for all users.
+    """
+    return as_lines(await read_users_api("/users"), role)
+
 
 async def get_user(ctx: RunContext, user_id: int) -> str:
-    """Return one user as JSON. The id is part of the path. GET /api/v1/users/{user_id}."""
+    """Get one user by id. Use this when the question names one id, for example user 3.
+
+    user_id: the id of the user, a whole number.
+    """
+    # GET /api/v1/users/{user_id}
     return await read_users_api(f"/users/{user_id}")
 
 
@@ -45,10 +69,10 @@ def weather_word(code: int) -> str:
 
 
 async def get_weather(ctx: RunContext, city: str, days: int = 7) -> str:
-    """Return the weather forecast for a city. days from 1 to 10, default 7.
+    """Get the weather forecast for a city.
 
     city: city name, for example Vienna.
-    days: number of days.
+    days: number of forecast days, from 1 to 10. Default 7.
     """
     span = max(1, min(days, 10))
     try:

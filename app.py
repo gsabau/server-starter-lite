@@ -47,9 +47,19 @@ async def main(page: ft.Page):
         send_button.disabled = False
         page.update()
 
+    def new_chat(e):
+        history.clear()
+        chat.controls.clear()
+        page.update()
+
     prompt.on_submit = send
     send_button = ft.Button("Senden", on_click=send)
-    page.add(tokens, ft.SelectionArea(content=chat, expand=True), ft.Row([prompt, send_button]))
+    new_chat_button = ft.Button("Neuer Chat", on_click=new_chat)
+    page.add(
+        tokens,
+        ft.SelectionArea(content=chat, expand=True),
+        ft.Row([prompt, send_button, new_chat_button]),
+    )
 
 
 if __name__ == "__main__":
