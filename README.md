@@ -2,7 +2,7 @@
 
 REST-API für eine Ressource: User. Eine Datei, `main.py`. Kein Frontend. Keine Datenbank. Der Speicher ist ein Dict.
 
-Beim Start liegen zehn User im Dict, von Ada bis Jens. Jeder hat eine `role` (`dev`, `crm`, `project`, `sales`), ein `created_at` und `hobbies`. Dazu optional `email`. Bei den zehn ist sie gesetzt. Die Hobbys sind `outdoors`, `gaming`, `movies`, `books`, `sports`, `music`, `cooking`, `travel`. Jeder der zehn hat mindestens eines, manche mehrere. Ein Neustart wirft jeden User weg, der danach angelegt wurde, und lädt die zehn wieder.
+Beim Start liegen zehn User im Dict, von Ada bis Jens. Jeder hat eine `role` (`developer`, `crm`, `project_manager`, `sales`), ein `created_at` und `hobbies`. Dazu optional `email`. Bei den zehn ist sie gesetzt. Die Hobbys sind `outdoors`, `gaming`, `movies`, `books`, `sports`, `music`, `cooking`, `travel`. Jeder der zehn hat mindestens eines, manche mehrere. Ein Neustart wirft jeden User weg, der danach angelegt wurde, und lädt die zehn wieder.
 
 In dieser Fassung steht der Vertrag im Vordergrund: Pfad, Methode, Status, Form. Und wo dieser Vertrag in `/docs` steht.
 

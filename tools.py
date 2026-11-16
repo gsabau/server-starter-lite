@@ -20,35 +20,35 @@ async def read_users_api(path: str) -> str:
 
 
 async def list_users(ctx: RunContext) -> str:
-    """Liest alle User. GET /api/v1/users. Kein Filter."""
+    """Return all users as JSON. No filter. GET /api/v1/users."""
     return await read_users_api("/users")
 
 async def get_user(ctx: RunContext, user_id: int) -> str:
-    """Liest einen User. Die Id steht im Pfad. GET /api/v1/users/{user_id}."""
+    """Return one user as JSON. The id is part of the path. GET /api/v1/users/{user_id}."""
     return await read_users_api(f"/users/{user_id}")
 
 
 def weather_word(code: int) -> str:
     if code == 0:
-        return "klar"
+        return "clear"
     if code in (1, 2, 3):
-        return "bewölkt"
+        return "cloudy"
     if code in (45, 48):
-        return "Nebel"
+        return "fog"
     if 51 <= code <= 67 or 80 <= code <= 82:
-        return "Regen"
+        return "rain"
     if 71 <= code <= 77 or 85 <= code <= 86:
-        return "Schnee"
+        return "snow"
     if code >= 95:
-        return "Gewitter"
+        return "thunderstorm"
     return str(code)
 
 
 async def get_weather(ctx: RunContext, city: str, days: int = 7) -> str:
-    """Wettervorhersage für eine Stadt. days von 1 bis 10, Standard 7.
+    """Return the weather forecast for a city. days from 1 to 10, default 7.
 
-    city: Stadtname, zum Beispiel Vienna oder Wien.
-    days: Anzahl der Tage.
+    city: city name, for example Vienna.
+    days: number of days.
     """
     span = max(1, min(days, 10))
     try:
@@ -61,7 +61,7 @@ async def get_weather(ctx: RunContext, city: str, days: int = 7) -> str:
             found.raise_for_status()
             places = found.json().get("results") or []
             if not places:
-                return "Stadt nicht gefunden."
+                return "City not found."
             place = places[0]
             forecast = await client.get(
                 "https://api.open-meteo.com/v1/forecast",

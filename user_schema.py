@@ -2,7 +2,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-Role = Literal["dev", "crm", "project", "sales"]
+Role = Literal["developer", "crm", "project_manager", "sales"]
 Hobby = Literal[
     "outdoors",
     "gaming",
@@ -19,7 +19,7 @@ class UserBody(BaseModel):
     name: str = Field(description="Name. Pflicht.")
     role: Role | None = Field(
         default=None,
-        description="Optional. Eine von dev, crm, project, sales.",
+        description="Optional. Eine von developer, crm, project_manager, sales.",
     )
     hobbies: list[Hobby] | None = Field(
         default=None,
@@ -36,7 +36,7 @@ class User(BaseModel):
     name: str = Field(description="Name des Users.")
     role: Role | None = Field(
         default=None,
-        description="Optional. dev, crm, project oder sales.",
+        description="Optional. developer, crm, project_manager oder sales.",
     )
     created_at: str | None = Field(
         default=None,

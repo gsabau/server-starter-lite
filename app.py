@@ -1,5 +1,4 @@
-import flet as ft
-
+import flet as ft  # pyright: ignore[reportMissingImports]
 from agent import make_agent
 
 
@@ -50,7 +49,7 @@ async def main(page: ft.Page):
 
     prompt.on_submit = send
     send_button = ft.Button("Senden", on_click=send)
-    page.add(tokens, chat, ft.Row([prompt, send_button]))
+    page.add(tokens, ft.SelectionArea(content=chat, expand=True), ft.Row([prompt, send_button]))
 
 
 if __name__ == "__main__":
